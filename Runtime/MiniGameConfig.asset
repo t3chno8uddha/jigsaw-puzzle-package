@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: MiniGameConfig
   m_EditorClassIdentifier: 
   MiniGameName: jigsaw_puzzle
-  Version: 0.1.0
+  Version: 0.1.3
   Url: https://pub-707f88fec1bb44dda473d9b079bc8a9e.r2.dev
   CustomRenderPipelineAsset: {fileID: 11400000, guid: a720c3d37b988fe4fae142a40b556faf, type: 2}
