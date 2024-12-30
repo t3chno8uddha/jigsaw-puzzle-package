@@ -1,6 +1,6 @@
 {
   "name": "com.appidea.minigames.jigsaw_puzzle",
-  "version": "0.1.3",
+  "version": "0.1.6",
   "displayName": "Jigsaw Puzzle",
   "description": "Puzzle Game",
   "dependencies": {

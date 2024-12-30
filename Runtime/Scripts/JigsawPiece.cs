@@ -22,6 +22,8 @@ public class JigsawPiece : MonoBehaviour
     Animator pieceAnimator;                         // Piece animator.
     RuntimeAnimatorController animatorController;   // Piece animator controller.
 
+    Vector3 startPosition; bool returning;
+
     void Start()
     {
         // Get components.
@@ -33,7 +35,6 @@ public class JigsawPiece : MonoBehaviour
         // Create colliders.
         pieceCollider = gameObject.AddComponent<PolygonCollider2D>();
         pieceCollider.isTrigger = true;
-
 
         // Create a shadow.
         shadow = new GameObject("Piece Shadow");
@@ -48,6 +49,7 @@ public class JigsawPiece : MonoBehaviour
         shadow.transform.localPosition = new Vector3 (shadowOffset.x, shadowOffset.y, 0);
 
         // Initialize other properties if needed.
+        startPosition = transform.position;
     }
 
     void Update()
@@ -62,6 +64,8 @@ public class JigsawPiece : MonoBehaviour
 
             if (touch.phase == TouchPhase.Began)
             {
+                returning = false;
+
                 // Raycast to check if the touch is on this piece.
                 RaycastHit2D hit = Physics2D.Raycast(touchPos, Vector2.zero);
                 if (hit.collider != null && hit.collider.gameObject == gameObject)
@@ -72,11 +76,19 @@ public class JigsawPiece : MonoBehaviour
                 }
             }
             else if (touch.phase == TouchPhase.Moved && isHeld)
-            {
+            { 
                 // Update the position while holding.
                 if (transform.position != touchPos)
                 {
                     transform.position = touchPos;
+                }
+
+                // Check if the piece is close enough to snap to the target.
+                if (Vector3.Distance(transform.position, target.position) < threshold)
+                {
+                    isHeld = false; // Stop holding the piece.
+                    if (pieceAnimator.GetBool("Held") == true) pieceAnimator.SetBool("Held", false);
+                    FinishMoving(); // Snap the piece into place.
                 }
             }
             else if (touch.phase == TouchPhase.Ended && isHeld)
@@ -87,12 +99,17 @@ public class JigsawPiece : MonoBehaviour
                 isHeld = false; // Stop holding the piece.
                 pieceRenderer.sortingOrder = 0;    // Reset sorting order.
 
-                // Check if the piece is close enough to snap to the target.
-                if (Vector3.Distance(transform.position, target.position) < threshold)
-                {
-                    FinishMoving(); // Snap the piece into place.
-                }
+                returning = true;
             }
+        }
+
+        else if (returning)
+        {
+            if (transform.position != startPosition)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, startPosition, threshold * Time.deltaTime * 50);
+            }
+            else returning = false;
         }
     }
 
